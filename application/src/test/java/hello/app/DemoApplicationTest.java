@@ -19,7 +19,7 @@ public class DemoApplicationTest {
 
     @Test
     public void contextLoads() {
-        assertThat(myService).isNull();
+        assertThat(myService).isNotNull();
     }
 
 }
