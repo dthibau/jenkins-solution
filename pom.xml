@@ -53,10 +53,10 @@
                         <goals>
                             <goal>report</goal>
                         </goals>
-                        <configuration>
+                        <!-- configuration>
                             <dataFile>${project.testresult.directory}/coverage/jacoco/jacoco.exec</dataFile>
                             <outputDirectory>${project.testresult.directory}/coverage/jacoco</outputDirectory>
-                        </configuration>
+                        </configuration -->
                     </execution>
                 </executions>
             </plugin>
