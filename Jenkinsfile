@@ -47,12 +47,17 @@ pipeline {
                     }
                      steps {
                         echo 'Analyse sonar'
-                         sh 'mvn clean test'
+                        sh 'mvn clean test'
                         script {
                             def scannerHome = tool 'SONAR4';
                             withSonarQubeEnv('SONAR_DOCKER') { // If you have configured more than one global server connection, you can specify its name
-                                sh "${scannerHome}/bin/sonar-scanner -Dproject.settings=sonar.properties"
+                                sh "${scannerHome}/bin/sonar-scanner -Dproject.settings=sonar.properties"                                
                             }
+                        }
+                        sleep 30
+                        withSonarQubeEnv('SONAR_DOCKER') { // If you have configured more than one global server connection, you can specify its name
+                            sh 'env'
+                            waitForQualityGate abortPipeline: true
                         }
                      }
                     
