@@ -54,11 +54,7 @@ pipeline {
                                 sh "${scannerHome}/bin/sonar-scanner -Dproject.settings=sonar.properties"                                
                             }
                         }
-                        sleep 30
-                        withSonarQubeEnv('SONAR_DOCKER') { // If you have configured more than one global server connection, you can specify its name
-                            sh 'env'
-                            waitForQualityGate abortPipeline: true
-                        }
+
                      }
                     
                 }
@@ -68,9 +64,26 @@ pipeline {
             
         stage('Déploiement intégration') {
             agent any
+            input {
+                message 'Vers quel data center voulez vous déployer ?'
+                ok 'Déployer !'
+                parameters {
+                    choice choices: ['Lille', 'Paris', 'Bruxelles'], description: '', name: 'DATACENTER'
+                }
+            }
             steps {
-                echo "Déploiement intégration"
-                
+                echo "Déploiement intégration vers $DATACENTER"
+                unstash 'webapp'
+                sh "cp *.jar /home/dthibau/Formations/Jenkins/MyWork/Serveur/${DATACENTER}.jar"
+                script {
+                    if ( env.DATACENTER.equals('Lille') ) {
+                        sh "cp *.jar /home/dthibau/Formations/Jenkins/MyWork/Serveur/Lille-if.jar"
+                    } else if ( env.DATACENTER.equals('Paris') ) {
+                        sh "cp *.jar /home/dthibau/Formations/Jenkins/MyWork/Serveur/Paris-if.jar"
+                    } else {
+                        echo "Neither Paris, neither Lille"
+                    }
+                }
             }
         }
 
