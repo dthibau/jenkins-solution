@@ -29,15 +29,31 @@ pipeline {
             parallel {
                 stage('Tests d integration') {
                     agent any
+                    tools {
+                        jdk 'JDK8'
+                        maven 'M3'
+                    }
                     steps {
                         echo 'Tests d integration'
+                        sh 'mvn clean integration-test'
                     }
                     
                 }
                  stage('Analyse Sonar') {
-                     agent any
+                    agent any
+                    tools {
+                        jdk 'JDK8'
+                        maven 'M3'
+                    }
                      steps {
                         echo 'Analyse sonar'
+                         sh 'mvn clean test'
+                        script {
+                            def scannerHome = tool 'SONAR4';
+                            withSonarQubeEnv('SONAR_DOCKER') { // If you have configured more than one global server connection, you can specify its name
+                                sh "${scannerHome}/bin/sonar-scanner -Dproject.settings=sonar.properties"
+                            }
+                        }
                      }
                     
                 }
