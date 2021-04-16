@@ -67,6 +67,9 @@ pipeline {
             
         stage('Déploiement intégration') {
             agent any
+            options {
+                timeout(time: 2, unit: 'MINUTES') 
+            }
             input {
                 message 'Vers quel provider voulez vous déployer ?'
                 ok 'Déployer'
@@ -78,7 +81,6 @@ pipeline {
             steps {
                 echo "Déploiement intégration vers $PROVIDER"
                 unstash 'webapp'
-                sh "cp *.jar /home/dthibau/Formations/Jenkins/MyWork/Serveur/${PROVIDER}.jar"
                 script {
                     if ( env.PROVIDER.equals('AZURE') ) {
                         sh "cp *.jar /home/dthibau/Formations/Jenkins/MyWork/Serveur/Lille-if.jar"
