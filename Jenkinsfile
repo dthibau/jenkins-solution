@@ -31,14 +31,15 @@ pipeline {
         stage('Analyse qualité et test intégration') {
             parallel {
                 stage('Tests d integration') {
-                    agent any
-                    tools {
-                        jdk 'JDK8'
-                        maven 'M3'
+                    agent {
+                        docker {
+                            image 'maven:3-alpine'
+                            args '-v $HOME/.m2:/root/.m2'
+                        }
                     }
                     steps {
                         echo 'Tests d integration'
-//                        sh 'mvn clean integration-test'
+                        sh 'mvn clean integration-test'
                     }
                     
                 }
@@ -85,8 +86,6 @@ pipeline {
                 }
                 beforeAgent true
             }
-
-
 
             steps {
                 echo "Déploiement intégration vers $PROVIDER"
