@@ -82,7 +82,8 @@ pipeline {
                     }
                 }
             }
-        }   
+        } 
+          
         stage('Déploiement intégration') {
             agent any
             options {
