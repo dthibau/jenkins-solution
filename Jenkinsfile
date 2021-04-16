@@ -15,6 +15,9 @@ pipeline {
                 dir('application/target') {
                     stash includes: '*.jar', name: 'webapp'
                 }
+                dir('application/target/classes') {
+                    stash includes: 'Dockerfile', name: 'dockerfile'
+                }
             }
             post {
                 always {
@@ -65,7 +68,21 @@ pipeline {
             }
             
         }
-            
+
+        stage('Déploiement DockerHub') {
+            agent any
+            steps {
+                unstash 'webapp'
+                unstash 'dockerfile'
+                script {
+                    def dockerImage = docker.build('dthibau/multi-module', '.')
+
+                    docker.withRegistry('https://registry.hub.docker.com', 'dthibau_docker') {
+                        dockerImage.push "build-${env.BUILD_NUMBER}"
+                    }
+                }
+            }
+        }   
         stage('Déploiement intégration') {
             agent any
             options {
