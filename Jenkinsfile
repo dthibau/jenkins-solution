@@ -12,6 +12,9 @@ pipeline {
             steps {
                 echo 'Unit test et packaging'
                 sh 'mvn -Dmaven.test.failure.ignore=true clean package'
+                dir('application/target') {
+                    stash includes: '*.jar', name: 'webapp'
+                }
             }
             post {
                 always {
@@ -65,23 +68,24 @@ pipeline {
         stage('Déploiement intégration') {
             agent any
             input {
-                message 'Vers quel data center voulez vous déployer ?'
-                ok 'Déployer !'
+                message 'Vers quel provider voulez vous déployer ?'
+                ok 'Déployer'
                 parameters {
-                    choice choices: ['Lille', 'Paris', 'Bruxelles'], description: '', name: 'DATACENTER'
+                    choice choices: ['AZURE', 'AMAZON', 'GOOGLE'], description: '', name: 'PROVIDER'
                 }
             }
+
             steps {
-                echo "Déploiement intégration vers $DATACENTER"
+                echo "Déploiement intégration vers $PROVIDER"
                 unstash 'webapp'
-                sh "cp *.jar /home/dthibau/Formations/Jenkins/MyWork/Serveur/${DATACENTER}.jar"
+                sh "cp *.jar /home/dthibau/Formations/Jenkins/MyWork/Serveur/${PROVIDER}.jar"
                 script {
-                    if ( env.DATACENTER.equals('Lille') ) {
+                    if ( env.PROVIDER.equals('AZURE') ) {
                         sh "cp *.jar /home/dthibau/Formations/Jenkins/MyWork/Serveur/Lille-if.jar"
-                    } else if ( env.DATACENTER.equals('Paris') ) {
+                    } else if ( env.PROVIDER.equals('AMAZON') ) {
                         sh "cp *.jar /home/dthibau/Formations/Jenkins/MyWork/Serveur/Paris-if.jar"
                     } else {
-                        echo "Neither Paris, neither Lille"
+                        echo "Neither AZURE, neither AMAZON"
                     }
                 }
             }
