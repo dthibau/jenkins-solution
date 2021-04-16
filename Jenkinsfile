@@ -38,7 +38,7 @@ pipeline {
                     }
                     steps {
                         echo 'Tests d integration'
-                        sh 'mvn clean integration-test'
+//                        sh 'mvn clean integration-test'
                     }
                     
                 }
@@ -50,13 +50,13 @@ pipeline {
                     }
                      steps {
                         echo 'Analyse sonar'
-                        sh 'mvn clean test'
-                        script {
-                            def scannerHome = tool 'SONAR4';
-                            withSonarQubeEnv('SONAR_DOCKER') { // If you have configured more than one global server connection, you can specify its name
-                                sh "${scannerHome}/bin/sonar-scanner -Dproject.settings=sonar.properties"                                
-                            }
-                        }
+//                        sh 'mvn clean test'
+//                        script {
+//                            def scannerHome = tool 'SONAR4';
+//                            withSonarQubeEnv('SONAR_DOCKER') { // If you have configured more than one global server connection, you can specify its name
+//                                sh "${scannerHome}/bin/sonar-scanner -Dproject.settings=sonar.properties"                                
+//                            }
+//                        }
 
                      }
                     
@@ -77,15 +77,25 @@ pipeline {
                     choice choices: ['AZURE', 'AMAZON', 'GOOGLE'], description: '', name: 'PROVIDER'
                 }
             }
+            when {
+                not {
+                    allOf {
+                        environment name: 'PROVIDER', value: 'GOOGLE'
+                    }
+                }
+                beforeAgent true
+            }
+
+
 
             steps {
                 echo "Déploiement intégration vers $PROVIDER"
                 unstash 'webapp'
                 script {
                     if ( env.PROVIDER.equals('AZURE') ) {
-                        sh "cp *.jar /home/dthibau/Formations/Jenkins/MyWork/Serveur/Lille-if.jar"
+                        sh "cp *.jar /home/dthibau/Formations/Jenkins/MyWork/Serveur/${env.PROVIDER}.jar"
                     } else if ( env.PROVIDER.equals('AMAZON') ) {
-                        sh "cp *.jar /home/dthibau/Formations/Jenkins/MyWork/Serveur/Paris-if.jar"
+                        sh "cp *.jar /home/dthibau/Formations/Jenkins/MyWork/Serveur/AMAZON.jar"
                     } else {
                         echo "Neither AZURE, neither AMAZON"
                     }
