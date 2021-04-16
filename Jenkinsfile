@@ -91,6 +91,7 @@ pipeline {
             }
             input {
                 message 'Vers quel provider voulez vous déployer ?'
+                submitter 'marketing'
                 ok 'Déployer'
                 parameters {
                     choice choices: ['AZURE', 'AMAZON', 'GOOGLE'], description: '', name: 'PROVIDER'
